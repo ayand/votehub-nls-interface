@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import PollsTable from './components/PollsTable'
+import BarChartView from './components/BarChartView'
 import { Poll } from './models'
+import { calculateChoicesWithColors } from './utils/pollUtils'
 
 export default function Home() {
   const [query, setQuery] = useState<string>('')
@@ -11,6 +13,7 @@ export default function Home() {
   const [error, setError] = useState<string>('')
   const [pollsGrouped, setPollsGrouped] = useState<Map<string, { subject: string; pollType: string; polls: Poll[]; colorMap: Record<string, string> }>>(new Map())
   const [activeTab, setActiveTab] = useState<string>('')
+  const [viewMode, setViewMode] = useState<'table' | 'chart'>('chart')
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -81,31 +84,45 @@ export default function Home() {
       maxWidth: '100%',
       overflowX: 'auto'
     }}>
-      <div style={{
-        backgroundColor: '#ffe4e1',
-        padding: '3rem 2rem',
-        borderRadius: '12px',
-        marginBottom: '2rem',
-        textAlign: 'center',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-      }}>
-        <h1 style={{
-          fontSize: '2.5rem',
+      <div
+        style={{
+          backgroundColor: '#e0f2fe', // light blue
+          padding: '1.5rem 1rem',
+          borderRadius: '12px',
           marginBottom: '2rem',
-          color: '#1e40af',
-          margin: '0 auto 2rem'
-        }}>
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '2rem',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <h1
+          style={{
+            fontSize: '2rem',
+            color: '#1e40af',
+            margin: 0,
+            flex: '0 0 auto',
+            whiteSpace: 'nowrap'
+          }}
+        >
           VoteHub Poll Search
         </h1>
 
-        <form onSubmit={handleSearch}>
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            maxWidth: '800px',
-            margin: '0 auto',
-            alignItems: 'center'
-          }}>
+        <form onSubmit={handleSearch} style={{
+          flex: '1 1 350px',
+          minWidth: '250px',
+          maxWidth: '700px',
+        }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
             <input
               type="text"
               value={query}
@@ -113,12 +130,13 @@ export default function Home() {
               placeholder="Enter your poll query (e.g., 'Biden approval ratings in the last month')"
               style={{
                 flex: 1,
-                padding: '0.75rem 1rem',
+                padding: '0.5rem 0.75rem',
                 fontSize: '1rem',
                 border: '2px solid #e5e7eb',
                 borderRadius: '8px',
                 outline: 'none',
                 transition: 'border-color 0.2s',
+                minWidth: 0
               }}
               onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
               onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
@@ -127,7 +145,7 @@ export default function Home() {
               type="submit"
               disabled={loading}
               style={{
-                padding: '0.75rem 2rem',
+                padding: '0.5rem 1.5rem',
                 fontSize: '1rem',
                 fontWeight: '600',
                 color: 'white',
@@ -207,33 +225,111 @@ export default function Home() {
             })}
           </div>
 
+          {/* View Mode Toggle */}
+          {activeTab && pollsGrouped.has(activeTab) && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              marginBottom: '1.5rem'
+            }}>
+              <button
+                onClick={() => setViewMode('chart')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  fontSize: '0.95rem',
+                  fontWeight: viewMode === 'chart' ? '600' : '500',
+                  color: viewMode === 'chart' ? '#ffffff' : '#6b7280',
+                  backgroundColor: viewMode === 'chart' ? '#2563eb' : '#ffffff',
+                  border: `2px solid ${viewMode === 'chart' ? '#2563eb' : '#e5e7eb'}`,
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (viewMode !== 'chart') {
+                    e.currentTarget.style.borderColor = '#3b82f6'
+                    e.currentTarget.style.color = '#3b82f6'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (viewMode !== 'chart') {
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.color = '#6b7280'
+                  }
+                }}
+              >
+                📈 Chart View
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  fontSize: '0.95rem',
+                  fontWeight: viewMode === 'table' ? '600' : '500',
+                  color: viewMode === 'table' ? '#ffffff' : '#6b7280',
+                  backgroundColor: viewMode === 'table' ? '#2563eb' : '#ffffff',
+                  border: `2px solid ${viewMode === 'table' ? '#2563eb' : '#e5e7eb'}`,
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (viewMode !== 'table') {
+                    e.currentTarget.style.borderColor = '#3b82f6'
+                    e.currentTarget.style.color = '#3b82f6'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (viewMode !== 'table') {
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.color = '#6b7280'
+                  }
+                }}
+              >
+                📊 Table View
+              </button>
+            </div>
+          )}
+          <h2 style={{ 
+            fontSize: '1.5rem', 
+            fontWeight: '700', 
+            color: '#1e40af', 
+            textAlign: 'center', 
+            marginTop: '1.5rem',
+            marginBottom: '1.5rem'
+          }}>
+            {pollsGrouped.get(activeTab)!.subject && (
+              <>
+                {pollsGrouped.get(activeTab)!.subject}
+                {' - '}
+              </>
+            )}
+            {pollsGrouped.get(activeTab)!.pollType
+              .split('-')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ')}
+          </h2>
+
           {/* Active Tab Content */}
           {activeTab && pollsGrouped.has(activeTab) && (
             <>
-              {/* Header showing active subject and poll type */}
-              <h2 style={{
-                fontSize: '1.75rem',
-                fontWeight: '600',
-                color: '#1e40af',
-                textAlign: 'center',
-                marginBottom: '1.5rem',
-                marginTop: '1rem'
-              }}>
-                {pollsGrouped.get(activeTab)!.subject && (
-                  <>
-                    {pollsGrouped.get(activeTab)!.subject}
-                    {' - '}
-                  </>
-                )}
-                {pollsGrouped.get(activeTab)!.pollType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-              </h2>
-              
-              <PollsTable
-                polls={pollsGrouped.get(activeTab)!.polls}
-                subject={pollsGrouped.get(activeTab)!.subject}
-                pollType={pollsGrouped.get(activeTab)!.pollType}
-                colorMap={pollsGrouped.get(activeTab)!.colorMap}
-              />
+              {viewMode === 'table' ? (
+                <PollsTable
+                  polls={pollsGrouped.get(activeTab)!.polls}
+                  subject={pollsGrouped.get(activeTab)!.subject}
+                  pollType={pollsGrouped.get(activeTab)!.pollType}
+                  colorMap={pollsGrouped.get(activeTab)!.colorMap}
+                />
+              ) : (
+                <BarChartView
+                  choices={calculateChoicesWithColors(
+                    pollsGrouped.get(activeTab)!.polls,
+                    pollsGrouped.get(activeTab)!.colorMap
+                  )}
+                  pollAmount={pollsGrouped.get(activeTab)!.polls.length}
+                />
+              )}
             </>
           )}
         </div>

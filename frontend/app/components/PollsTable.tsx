@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { PollsTableProps, Poll, Answer } from '../models';
 import ChoicesSummary from './ChoicesSummary';
+import { normalizeChoice, calculateChoicesWithColors } from '../utils/pollUtils';
 
 
 export default function PollsTable({ polls, subject, pollType, colorMap }: PollsTableProps) {
   const [colorsLoaded, setColorsLoaded] = useState(false)
-  
-  // Normalize choice names by removing periods, commas, and extra whitespace
-  const normalizeChoice = (choice: string): string => {
-    return choice
-      .replace(/\./g, '') // Remove periods
-      .replace(/,/g, '') // Remove commas
-      .replace(/\s+/g, ' ') // Normalize whitespace
-      .trim()
-  }
 
-  // Calculate unique choices for this group of polls with normalization
+  // Calculate choices with colors using shared utility
+  const choicesWithColors = calculateChoicesWithColors(polls, colorMap)
+
+  // Calculate unique choices for this group of polls with normalization (for internal use)
   const choiceStats = new Map<string, { total: number; count: number; displayName: string; originalNames: string[] }>()
   polls.forEach((poll: Poll) => {
     poll.answers?.forEach((answer: Answer) => {
@@ -41,12 +36,6 @@ export default function PollsTable({ polls, subject, pollType, colorMap }: Polls
     }))
     .sort((a, b) => b.average - a.average)
 
-  // Store and print top 10 highest ranking choices
-  const top10Choices: string[] = uniqueChoices
-    .slice(0, 10)
-    .map(item => item.displayName)
-  console.log('Top 10 Choices:', top10Choices)
-
   // Set colors as loaded since they're passed as a prop
   useEffect(() => {
     setColorsLoaded(true)
@@ -64,7 +53,7 @@ export default function PollsTable({ polls, subject, pollType, colorMap }: Polls
     const sorted = [...poll.answers].sort((a, b) => b.pct - a.pct)
     const winner = sorted[0]
     const margin = sorted.length > 1 ? winner.pct - sorted[1].pct : winner.pct
-    
+
     // Use normalized name for winner
     const normalizedWinner = normalizeChoice(winner.choice)
     const displayName = choiceStats.get(normalizedWinner)?.displayName || winner.choice
@@ -111,15 +100,6 @@ export default function PollsTable({ polls, subject, pollType, colorMap }: Polls
       </div>
     )
   }
-
-  // Prepare choices data for the summary component
-  const choicesWithColors = uniqueChoices
-    .slice(0, 10)
-    .map(item => ({
-      displayName: item.displayName,
-      average: item.average,
-      color: colorMap[item.displayName] || '#7f7f7f'
-    }))
 
   return (
     <div style={{ marginBottom: '2rem' }}>

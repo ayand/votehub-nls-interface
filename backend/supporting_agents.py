@@ -47,13 +47,14 @@ async def get_party_affiliations(choices: List[str]):
 
 def create_name_correction_agent():
     system_prompt = """
-    You are a name correction agent. Your input is a comma-separated list of names. You must correct the names to the correct name. All of the correct names are in fact included in your input.
+    You are a name correction agent. Your input is a comma-separated list of names. You must correct the names to the correct name. All of the correct names are in fact included in your input. If the difference between the names is just dots, remove the dots. If you don't recognize the name, you should call your search tool to acquire the results.
 
     You must output your response in JSON format.
     """
     return Agent(
         name="name_correction_agent",
         model="gpt-5",
+        tools=[WebSearchTool()],
         instructions=system_prompt,
         output_type=NameCorrectionList,
     )
