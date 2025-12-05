@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import PollsTable from './components/PollsTable'
-import BarChartView from './components/BarChartView'
+import ChartView from './components/ChartView'
 import { Poll } from './models'
 import { calculateChoicesWithColors } from './utils/pollUtils'
 
@@ -322,12 +322,13 @@ export default function Home() {
                   colorMap={pollsGrouped.get(activeTab)!.colorMap}
                 />
               ) : (
-                <BarChartView
+                <ChartView
                   choices={calculateChoicesWithColors(
                     pollsGrouped.get(activeTab)!.polls,
                     pollsGrouped.get(activeTab)!.colorMap
                   )}
                   pollAmount={pollsGrouped.get(activeTab)!.polls.length}
+                  polls={pollsGrouped.get(activeTab)!.polls}
                 />
               )}
             </>

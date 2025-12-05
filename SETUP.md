@@ -4,7 +4,6 @@
 
 - Docker and Docker Compose installed
 - OpenAI API key
-- Tavily API key
 
 ## Environment Variables
 
@@ -12,7 +11,6 @@ Create a `.env` file in the root directory with the following variables:
 
 ```bash
 OPENAI_API_KEY=your_openai_api_key_here
-TAVILY_API_KEY=your_tavily_api_key_here
 ```
 
 ### Getting API Keys
@@ -22,12 +20,6 @@ TAVILY_API_KEY=your_tavily_api_key_here
 2. Sign up or log in
 3. Navigate to API Keys section
 4. Create a new API key
-
-#### Tavily API Key
-1. Go to https://tavily.com/
-2. Sign up for an account
-3. Navigate to your dashboard
-4. Copy your API key
 
 ## Quick Start
 
@@ -83,7 +75,6 @@ docker-compose down
 2. **Set environment variables**:
    ```bash
    export OPENAI_API_KEY=your_openai_api_key
-   export TAVILY_API_KEY=your_tavily_api_key
    ```
 
 3. **Run the backend**:
@@ -109,11 +100,6 @@ docker-compose down
 ## Features
 
 ### Search Integration
-
-The application uses Tavily Search API for finding party affiliations:
-- Provides accurate, up-to-date information about politicians
-- Integrated with LangChain for intelligent searching
-- Rate-limited to prevent API quota issues
 
 ## Troubleshooting
 
