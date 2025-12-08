@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import PollsTable from './components/PollsTable'
 import ChartView from './components/ChartView'
+import LoadingSpinner from './components/LoadingSpinner'
 import { Poll } from './models'
 import { calculateChoicesWithColors } from './utils/pollUtils'
 
@@ -180,7 +181,9 @@ export default function Home() {
         </div>
       )}
 
-      {polls.length > 0 && (
+      {loading && <LoadingSpinner />}
+
+      {!loading && polls.length > 0 && (
         <div>
           {/* Tab Navigation */}
           <div style={{
