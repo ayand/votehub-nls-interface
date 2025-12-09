@@ -10,6 +10,12 @@ VoteHub ChatBot allows users to query political polls using natural language. Th
 - Determine party affiliations
 - Generate intelligent color mappings for visualizations
 
+## Data Source
+
+This project uses the [VoteHub Polls API](https://votehub.com/polls/api/) to fetch political polling data. The API provides comprehensive access to poll results, including approval ratings, primary elections, general elections, and more.
+
+**License**: The VoteHub API data is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), which allows sharing and adaptation with appropriate attribution.
+
 ## Project Structure
 
 ```
