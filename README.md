@@ -160,23 +160,14 @@ The Flask backend exposes the following endpoints:
 
 ```json
 {
-  "polls": [
-    {
-      "division_key": ["Biden", "approval"],
-      "polls": [...],
-      "stats": {
-        "choice_name": {
-          "mean": 45.2,
-          "median": 45.0,
-          "std": 2.1,
-          "count": 10
-        }
-      },
-      "color_map": {
-        "choice_name": "#3b82f6"
-      }
+    "subject_poll-type": {
+        "color_map": {
+            "KEY1": "VALUE1",
+            "KEY2": "VALUE2",
+            "KEY3": "VALUE3"
+        },
+        "polls": [ ... ]
     }
-  ]
 }
 ```
 
@@ -227,7 +218,7 @@ See [SETUP.md](SETUP.md) for detailed instructions on running the application lo
 
 ### Data Processing
 - Groups polls by subject and type
-- Calculates statistics (mean, median, std, count)
+- Calculates statistics (mean, count)
 - Deduplicates answers across multiple polls
 - Handles missing or incomplete data
 
